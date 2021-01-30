@@ -5,11 +5,11 @@ import io from 'socket.io-client'
 
 const socketInstance = io('/', {
   transports: ['websocket'],
-  rejectUnauthorized: false,
-  reconnection: true,
-  reconnectionDelay: 1000,
-  reconnectionDelayMax: 5000,
-  reconnectionAttempts: 15
+  //rejectUnauthorized: false,
+  //reconnection: true,
+  //reconnectionDelay: 1000,
+  //reconnectionDelayMax: 5000,
+  //reconnectionAttempts: 15
 })
 
 export default ({ store }) => {
