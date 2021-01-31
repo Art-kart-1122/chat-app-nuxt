@@ -13,7 +13,8 @@ class Users {
     // hardcode
     DB.users.push({
       id, username: `U${Math.random()}`,
-      img: '/user.png', status: 'online'
+      img: '/user.png', status: 'online',
+      isBot: false
     })
 
     //
@@ -30,6 +31,12 @@ class Users {
     return DB.users.find(user => user.id === id)
   }
 
+  static isBot(id) {
+    return this.getById(id)?.isBot
+  }
+  static getSpamBots() {
+    return DB.users.filter(user => user.isSpamBot)
+  }
   static setUserStatusByID(id, status) {
     if(this.getById(id) && this.status.includes(status)) {
 

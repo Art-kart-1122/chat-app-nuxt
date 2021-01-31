@@ -6,6 +6,10 @@ const {Users} = require('./models/Users');
 const {ChatRooms} = require('./models/ChatRooms');
 const {Messages} = require('./models/Messages');
 
+const spamBotsStart = require('./util/startSpamBots');
+
+
+
 io.on("connection", (socket) => {
   let curId ='';
 
@@ -44,15 +48,63 @@ io.on("connection", (socket) => {
     socket.emit('changeMessages', Messages.getMessagesByChatRoomId(roomId));
   })
 
-  socket.on('sendMessage', ({roomId, text, ownerId}) => {
+  socket.on('sendMessage', async ({roomId, text, ownerId}) => {
     //validation message
-    console.log(roomId, 'room ID for message')
-    console.log(Messages.create({roomId, text, ownerId}), 'message');
-
-    const updatedMessages = Messages.getMessagesByChatRoomId(roomId);
-    console.log(updatedMessages)
-    io.to(roomId).emit('changeMessages', updatedMessages);
+    //console.log(roomId, 'room ID for message')
+    //Messages.create({roomId, text, ownerId});
+    //
+    // check if exist room and ownerId in room
+    const receiverId = ChatRooms.getUsersIdByChatroomId(roomId)
+      .find(id => id !== ownerId);
+    Messages.create({roomId, text, ownerId});
+    let updatedMessages = Messages.getMessagesByChatRoomId(roomId);
     socket.emit('changeMessages', updatedMessages);
+    if(Users.isBot(receiverId)) {
+      console.log('IS BOT')
+      const path = Users.getById(receiverId).path
+      console.log(path)
+      const answer = await require(path)(text);
+      console.log(answer, '-- answer')
+      if(answer) {
+        Messages.create({roomId, answer, ownerId});
+
+        //const updatedMessages = Messages.getMessagesByChatRoomId(roomId);
+        //socket.emit('changeMessages', updatedMessages);
+      }
+    } else {
+      console.log('IS USER')
+      //const updatedMessages = Messages.getMessagesByChatRoomId(roomId);
+      //io.to(roomId).emit('changeMessages', updatedMessages);
+      //socket.emit('changeMessages', updatedMessages);
+    }
+    updatedMessages = Messages.getMessagesByChatRoomId(roomId);
+    io.to(roomId).emit('changeMessages', updatedMessages);
+    //socket.emit('changeMessages', updatedMessages);
+
+
+    //
+    //const updatedMessages = Messages.getMessagesByChatRoomId(roomId);
+    //console.log(updatedMessages)
+    //io.to(roomId).emit('changeMessages', updatedMessages);
+    //socket.emit('changeMessages', updatedMessages);
+  })
+
+  socket.on('sendMessageToBot', async ({roomId, text, ownerId}) => {
+    const botId = ChatRooms.getUsersIdByChatroomId(roomId)
+      .find(id => id !== ownerId);
+
+    if(Users.isBot(botId)) {
+      Messages.create({roomId, text, ownerId});
+
+      const path = Users.getById(botId).path
+      const answer = await require(path)();
+      if(answer) {
+        Messages.create({roomId, answer, ownerId});
+
+        const updatedMessages = Messages.getMessagesByChatRoomId(roomId);
+        socket.emit('changeMessages', updatedMessages);
+      }
+    }
   })
 
   socket.on('disconnect', () => {
@@ -66,6 +118,8 @@ io.on("connection", (socket) => {
       socket.broadcast.emit('changeContacts', Users.getAll());
     }
   })
+
+  spamBotsStart(io)
 
 })
 
