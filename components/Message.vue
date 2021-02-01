@@ -1,41 +1,55 @@
 <template>
-  <div class="list-group-item">
-    <div class="wrap-msg reverse">
-      <div class="head-msg">
-        <div class="name">Artur</div>
-        <div class="time">00:23</div>
-      </div>
-      <div class="body-msg-right">
-        {{message.text}}
+  <div class="">
+
+    <div v-if="msg.ownerId === user.id">
+      <div class="wrap-msg reverse">
+        <div class="head-msg">
+          <div class="name">{{user.username}}</div>
+          <div class="time">{{msg.date}}</div>
+        </div>
+        <div class="body-msg-right">
+          {{msg.text}}
+        </div>
       </div>
     </div>
+
+    <div v-else>
+      <div class="wrap-msg">
+        <div class="head-msg">
+          <div class="name">{{currentContact.username}}</div>
+          <div class="time">{{msg.date}}</div>
+        </div>
+        <div class="body-msg">
+          {{msg.text}}
+        </div>
+      </div>
+    </div>
+
   </div>
+
 </template>
 
 
 <script>
+import {mapGetters} from 'vuex'
 export default {
   props: {
-    message: {
+    msg: {
       type: Object,
       required: true
     }
+  },
+  computed: {
+    ...mapGetters(['user', 'currentContact'])
   }
 }
 </script>
 
 <style scoped>
 .list-group-item {
-  background-color: rgba(176,175,255,0.69)
-}
-.produced {
-  background: rgba(88,255,10,0.26);
-  float: right;
+
 }
 
-.received {
-  background: rgba(14,64,255,0.26);
-}
 .head-msg {
   display: flex;
   justify-content: space-between;
@@ -50,17 +64,7 @@ export default {
   border-radius: 0px 0px 10px 10px;
   position: relative;
 }
-/*
-.body-msg::after{
-  margin-left: -50px;
-  margin-bottom: 0px;
-  content: '';
-  width: 0;
-  height: 0;
-  border-top: 15px solid white;
-  border-left: 15px solid transparent;
-}
-*/
+
 .time {
   padding-right: 10px;
 }
@@ -68,8 +72,10 @@ export default {
   font-weight: bold;
   padding-left: 10px;
 }
+
 .wrap-msg {
-  padding: 0;
+  margin: 10px 0px 10px 0px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   width: 65%;
@@ -91,6 +97,9 @@ export default {
 
 .reverse {
   float: right;
+}
+.reverse > .head-msg {
+  background-color: rgba(176,175,255,0.69);
 }
 
 .body-msg-right{

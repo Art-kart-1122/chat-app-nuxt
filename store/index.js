@@ -6,6 +6,7 @@ export const state = () => ({
     status: ''
   },
   contacts: [],
+  currentContact: '',
   chatRoom: '',
   messages: []
 })
@@ -18,7 +19,10 @@ export const mutations = {
   setUserStatus(state, status) {
     state.user.status = status;
   },
-
+  setCurrentContact(state, contactId) {
+    console.log('CHANGE CURRENT CONTACT')
+    state.currentContact = contactId;
+  },
   SOCKET_changeContacts(state, contacts) {
     state.contacts = contacts;
     //
@@ -33,8 +37,8 @@ export const mutations = {
     console.log(state.chatRoom)
   },
 
-  SOCKET_changeMessages(state, messages) {
-    state.messages = messages;
+  SOCKET_changeMessages(state, {roomId, messages}) {
+    if(state.chatRoom === roomId) state.messages = messages;
 
     console.log('CHANGE MESSAGES')
     console.log(state.messages)
@@ -98,11 +102,12 @@ export const actions = {
       }
     })
   },
-  startMessages({dispatch, state}, receiverId) {
+  startMessages({dispatch, state, commit}, contact) {
     const {user} = state;
+    commit('setCurrentContact', contact);
     dispatch('socketEmit', {
       action: 'changeChatRoomByUsers',
-      payload: {id1: user.id, id2: receiverId}
+      payload: {id1: user.id, id2: contact.id}
     })
   },
   sendMessage({dispatch, state}, text) {
@@ -114,10 +119,17 @@ export const actions = {
 }
 
 export const getters = {
-  user: state => ({username: state.user.username, img: state.user.img}),
+  user: state => state.user,
   contacts: state => state.contacts.filter(cnt => cnt.id !== state.user.id),
+
   onlineUsers: state => state.contacts
     .filter(cnt => cnt.id !== state.user.id)
     .filter(user => user.status === 'online'),
-  messages: state => state.messages
+
+  allUsers: state => state.contacts
+    .filter(cnt => cnt.id !== state.user.id),
+
+  messages: state => state.messages,
+  currentContact: state => state.currentContact ? state.currentContact : state.user,
+  chatSelected: state => !!state.chatRoom
 }

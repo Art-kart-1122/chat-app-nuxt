@@ -9,7 +9,7 @@ class Messages {
 
   static create({roomId, text, ownerId}) {
     const id = uuid.v4();
-    const date = (new Date()).toISOString().slice(11, 16)
+    const date = (new Date()).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
 
     DB.messages.push({
       id, roomId, text,

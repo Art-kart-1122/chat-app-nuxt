@@ -16,7 +16,7 @@ const aliveDemon = (io, id) => {
 
     const updatedMessages = Messages.getMessagesByChatRoomId(chat.id);
 
-    io.to(chat.id).emit('changeMessages', updatedMessages);
+    io.to(chat.id).emit('changeMessages', {roomId: chat.id, messages:updatedMessages});
   })
   setTimeout(() => aliveDemon(io, id), randomTime * 1000)
 }

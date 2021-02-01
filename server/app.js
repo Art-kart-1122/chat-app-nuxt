@@ -49,9 +49,10 @@ io.on("connection", (socket) => {
 
     socket.emit('changeChatRoom', roomId);
     socket.join(roomId);
-    socket.emit('changeMessages', Messages.getMessagesByChatRoomId(roomId));
+    socket.emit('changeMessages', {roomId, messages: Messages.getMessagesByChatRoomId(roomId)});
   })
   spamBotsStart(socket)
+
   socket.on('sendMessage', async ({roomId, text, ownerId}) => {
     //validation message
     //console.log(roomId, 'room ID for message')
@@ -62,7 +63,7 @@ io.on("connection", (socket) => {
       .find(id => id !== ownerId);
     Messages.create({roomId, text, ownerId});
     let updatedMessages = Messages.getMessagesByChatRoomId(roomId);
-    socket.emit('changeMessages', updatedMessages);
+    socket.emit('changeMessages', {roomId, messages:updatedMessages});
     if(Users.isBot(receiverId)) {
       console.log('IS BOT')
       const path = Users.getById(receiverId).path
@@ -70,7 +71,7 @@ io.on("connection", (socket) => {
       const answer = await require(path)(text);
       console.log(answer, '-- answer')
       if(answer) {
-        Messages.create({roomId, text: answer, ownerId});
+        Messages.create({roomId, text: answer, ownerId: receiverId});
 
         //const updatedMessages = Messages.getMessagesByChatRoomId(roomId);
         //socket.emit('changeMessages', updatedMessages);
@@ -82,7 +83,7 @@ io.on("connection", (socket) => {
       //socket.emit('changeMessages', updatedMessages);
     }
     updatedMessages = Messages.getMessagesByChatRoomId(roomId);
-    io.to(roomId).emit('changeMessages', updatedMessages);
+    io.to(roomId).emit('changeMessages', {roomId, messages:updatedMessages});
     //socket.emit('changeMessages', updatedMessages);
 
 
@@ -92,7 +93,7 @@ io.on("connection", (socket) => {
     //io.to(roomId).emit('changeMessages', updatedMessages);
     //socket.emit('changeMessages', updatedMessages);
   })
-
+/*
   socket.on('sendMessageToBot', async ({roomId, text, ownerId}) => {
     const botId = ChatRooms.getUsersIdByChatroomId(roomId)
       .find(id => id !== ownerId);
@@ -111,7 +112,7 @@ io.on("connection", (socket) => {
       }
     }
   })
-
+*/
   socket.on('disconnect', () => {
     //
     //console.log('ONE DISCONNECT', curId);
