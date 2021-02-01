@@ -8,6 +8,10 @@ const {Messages} = require('./models/Messages');
 
 const spamBotsStart = require('./util/startSpamBots');
 
+// !!!!! validation
+// clean code
+// EVENT NAME TO CONSTANT
+//
 
 
 io.on("connection", (socket) => {
@@ -47,7 +51,7 @@ io.on("connection", (socket) => {
     socket.join(roomId);
     socket.emit('changeMessages', Messages.getMessagesByChatRoomId(roomId));
   })
-
+  spamBotsStart(socket)
   socket.on('sendMessage', async ({roomId, text, ownerId}) => {
     //validation message
     //console.log(roomId, 'room ID for message')
@@ -66,7 +70,7 @@ io.on("connection", (socket) => {
       const answer = await require(path)(text);
       console.log(answer, '-- answer')
       if(answer) {
-        Messages.create({roomId, answer, ownerId});
+        Messages.create({roomId, text: answer, ownerId});
 
         //const updatedMessages = Messages.getMessagesByChatRoomId(roomId);
         //socket.emit('changeMessages', updatedMessages);
@@ -99,7 +103,8 @@ io.on("connection", (socket) => {
       const path = Users.getById(botId).path
       const answer = await require(path)();
       if(answer) {
-        Messages.create({roomId, answer, ownerId});
+        console.log('e')
+        Messages.create({roomId, text: answer, ownerId});
 
         const updatedMessages = Messages.getMessagesByChatRoomId(roomId);
         socket.emit('changeMessages', updatedMessages);
@@ -119,7 +124,6 @@ io.on("connection", (socket) => {
     }
   })
 
-  spamBotsStart(io)
 
 })
 

@@ -114,7 +114,10 @@ export const actions = {
 }
 
 export const getters = {
-  user: state => state.user.username,
-  contacts: state => state.contacts,
-  onlineUsers: state => state.contacts.filter(user => user.status === 'online')
+  user: state => ({username: state.user.username, img: state.user.img}),
+  contacts: state => state.contacts.filter(cnt => cnt.id !== state.user.id),
+  onlineUsers: state => state.contacts
+    .filter(cnt => cnt.id !== state.user.id)
+    .filter(user => user.status === 'online'),
+  messages: state => state.messages
 }

@@ -12,7 +12,7 @@ class Users {
 
     // hardcode
     DB.users.push({
-      id, username: `U${Math.random()}`,
+      id, username: `User${Math.floor(Math.random() * 100)}`,
       img: '/user.png', status: 'online',
       isBot: false
     })
@@ -24,7 +24,7 @@ class Users {
   }
 
   static getAll() {
-    return DB.users
+    return DB.users.map(user => ({id: user.id, username: user.username, img: user.img, status: user.status}))
   }
 
   static getById(id) {
