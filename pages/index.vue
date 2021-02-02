@@ -6,10 +6,10 @@
       <div class="row">
         <div class="col-8 merge">
 
-          <div class="modal-open-btn" @click="openModal"></div>
+          <div class="modal-open-btn" @click="() => changeModal(true)"></div>
 
           <div v-if="showModal">
-            <div class="modal-contacts" @click.self="closeModal">
+            <div class="modal-contacts" @click.self="() => changeModal(false)">
                 <ContactsList/>
             </div>
           </div>
@@ -39,12 +39,8 @@ export default {
   },
 
   methods: {
-    openModal() {
-      this.showModal = true;
-    },
-
-    closeModal() {
-      this.showModal = false;
+    changeModal(state) {
+      this.showModal = !!state;
     }
   }
 }

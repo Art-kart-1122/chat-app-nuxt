@@ -2,9 +2,11 @@ const app = require("express")();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 
-const {SET_USER_STATUS, AUTHENTICATION,
+const {SET_USER_STATUS, AUTHENTICATION, SEND_SYSTEM_MESSAGE,
   SEND_MESSAGE, CHANGE_CHATROOM_BY_USERS} = require('./util/actionsTypesFromClient');
-const {CHANGE_MESSAGES, CHANGE_CONTACTS, CHANGE_CHAT_ROOM} = require('./util/actionsTypesToClient');
+const {CHANGE_MESSAGES, CHANGE_CONTACTS,
+  CHANGE_CHAT_ROOM, CHANGE_SYSTEM_MESSAGE} = require('./util/actionsTypesToClient');
+
 const spamBotsStart = require('./util/startSpamBots');
 
 
@@ -29,9 +31,9 @@ io.on("connection", (socket) => {
     // debug
     //console.log('SERVER AUTHENTICATION ', id);
     //
-
-    socket.emit(CHANGE_CONTACTS, Users.getAll());
-    socket.broadcast.emit(CHANGE_CONTACTS, Users.getAll());
+    const updatedUsers = Users.getAll()
+    socket.emit(CHANGE_CONTACTS, updatedUsers);
+    socket.broadcast.emit(CHANGE_CONTACTS, updatedUsers);
 
     return isValid ? cb({isValid}) : cb({isValid, user: Users.getById(curId)})
   })
@@ -95,15 +97,32 @@ io.on("connection", (socket) => {
     //
 
     if(Users.isBot(receiverId)) {
-
-      console.log('SERVER SEND MESSAGE -- BOT')
-
+      // debug
+      //console.log('SERVER SEND MESSAGE -- BOT')
+      //
       const path = Users.getById(receiverId).path
       const answer = await require(path)(text);
       if(answer) Messages.create({roomId, text: answer, ownerId: receiverId});
     }
 
     io.to(roomId).emit(CHANGE_MESSAGES, {roomId, messages: Messages.getMessagesByChatRoomId(roomId)});
+  })
+
+  socket.on(SEND_SYSTEM_MESSAGE, ({roomId, text, ownerId}) => {
+
+    //validation
+    if(!(roomId && text && ownerId &&
+      ChatRooms.isValid(roomId) && Users.isValidId(ownerId))) return socket.disconnect()
+    //
+
+    // debug
+    //console.log('SERVER SEND SYSTEM MESSAGE')
+    //
+
+    const receiverId = ChatRooms.getUsersIdByChatroomId(roomId)
+      .find(id => id !== ownerId);
+
+    io.to(roomId).emit(CHANGE_SYSTEM_MESSAGE, {roomId, message: text, receiverId});
   })
 
   socket.on('disconnect', () => {

@@ -111,7 +111,7 @@ export default {
 }
 
 .contact-area {
-  height: 660px;
+  height: 690px;
 }
 
 .nav-link {

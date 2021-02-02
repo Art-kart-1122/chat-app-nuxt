@@ -8,7 +8,8 @@ export const state = () => ({
   contacts: [],
   currentContact: '',
   chatRoom: '',
-  messages: []
+  messages: [],
+  systemMessage: ''
 })
 
 export const mutations = {
@@ -38,6 +39,10 @@ export const mutations = {
 
   SOCKET_changeMessages(state, {roomId, messages}) {
     if(state.chatRoom === roomId) state.messages = messages;
+  },
+
+  SOCKET_changeSystemMessage(state, {roomId, message, receiverId}) {
+    if(state.chatRoom === roomId && state.user.id === receiverId) state.systemMessage = message;
   }
 }
 
@@ -46,7 +51,7 @@ const SEND_MESSAGE = 'sendMessage';
 const CHANGE_CHATROOM_BY_USERS = 'changeChatRoomByUsers';
 const SET_USER_STATUS = 'setUserStatus';
 const AUTHENTICATION = 'Auth';
-
+const SEND_SYSTEM_MESSAGE = 'sendSystemMessage';
 
 export const actions = {
 
@@ -147,6 +152,16 @@ export const actions = {
       action: SEND_MESSAGE,
       payload: {roomId: state.chatRoom, text, ownerId: state.user.id}
     })
+  },
+
+  notify({dispatch, state}, text) {
+    // debug
+    //console.log('CLIENT SEND SYSTEM MESSAGE')
+    //
+    dispatch('socketEmit', {
+      action: SEND_SYSTEM_MESSAGE,
+      payload: {roomId: state.chatRoom, text, ownerId: state.user.id}
+    })
   }
 }
 
@@ -163,5 +178,6 @@ export const getters = {
 
   messages: state => state.messages,
   currentContact: state => state.currentContact ? state.currentContact : state.user,
-  chatSelected: state => !!state.chatRoom
+  chatSelected: state => !!state.chatRoom,
+  systemMessage: state => state.systemMessage
 }

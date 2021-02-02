@@ -31,8 +31,10 @@
 
 
       <div class="card-body">
+        <div class="system-msg">{{systemMessage === 'typing' ?`${currentContact.username} is typing ...` : ''}}</div>
         <div class="input-form">
-          <input v-model="newMessage" v-on:keyup.enter="send" type="text" class="form-control" placeholder="Start chatting!" aria-label="Username" aria-describedby="basic-addon1">
+          <input v-model="newMessage" v-on:keyup.enter="send" v-on:blur="() => notify('leave')" v-on:input="() => notify('typing')"
+                 type="text" class="form-control" placeholder="Start chatting!" aria-label="Username" aria-describedby="basic-addon1">
           <button type="button" class="btn btn-primary" @click="send">Send message</button>
         </div>
       </div>
@@ -55,11 +57,11 @@ export default {
   },
 
   computed: {
-    ...mapGetters(['currentContact', 'chatSelected', 'messages'])
+    ...mapGetters(['currentContact', 'chatSelected', 'messages', 'systemMessage'])
   },
 
   methods: {
-    ...mapActions(['sendMessage']),
+    ...mapActions(['sendMessage', 'notify']),
 
     _isValidMessage(msg) {
        return !!(msg && msg.replace(/\s+/g, ''))
@@ -174,5 +176,11 @@ img {
 .description-text {
   overflow-wrap: break-word;
 }
+.system-msg {
+  width: 100%;
+  text-align: center;
+  color: #4B8EB2;
+  height: 30px;
 
+}
 </style>
