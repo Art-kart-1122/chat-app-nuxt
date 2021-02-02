@@ -20,10 +20,15 @@ class ChatRooms {
     return DB.rooms.find(room => room.id === id).users
   }
 
+  static isValid(id) {
+    return DB.rooms.find(room => room.id === id)?.id === id
+  }
+
   static getChatRoomIdByUsersId({id1, id2}) {
     return DB.rooms.filter(room => room.users.includes(id1))
       .filter(room => room.users.includes(id2))[0]?.id
   }
+
   static getChatRoomsByOneUserId(id) {
     return DB.rooms.filter(room => room.users.includes(id))
   }

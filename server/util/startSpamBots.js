@@ -1,8 +1,8 @@
 const {Users} = require('../models/Users');
 
-module.exports = (io) => {
+module.exports = (socket) => {
   const spamBots = Users.getSpamBots();
   spamBots.forEach(bot => {
-    require(bot.pathToExecutableFile)(io, bot.params)
+    require(bot.pathToExecutableFile)(socket, bot.params)
   })
 }

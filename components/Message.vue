@@ -46,14 +46,11 @@ export default {
 </script>
 
 <style scoped>
-.list-group-item {
-
-}
 
 .head-msg {
   display: flex;
   justify-content: space-between;
-  background-color: rgba(255,209,120,0.69);
+  background-color: #BECBD9;
   padding: 5px 10px 5px 10px;
 
   border-radius: 10px 10px 0px 0px
@@ -99,7 +96,7 @@ export default {
   float: right;
 }
 .reverse > .head-msg {
-  background-color: rgba(176,175,255,0.69);
+  background-color: #F0CBB3;
 }
 
 .body-msg-right{

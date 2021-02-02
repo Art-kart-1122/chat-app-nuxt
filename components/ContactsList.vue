@@ -16,15 +16,15 @@
 
         <div v-if="queryStr">
           <Contact v-for="user in filteredUsers" :key="user.id" @click.native="() => changeContact(user)"
-                   v-bind:class="{'active': activeContact === user.id}" v-bind:contact="user"></Contact>
+                   v-bind:class="{'selected': activeContact === user.id}" v-bind:contact="user"></Contact>
         </div>
         <div v-else-if="activeTab === 'Online'">
           <Contact v-for="user in onlineUsers" :key="user.id" @click.native="() => changeContact(user)"
-                   v-bind:class="{'active': activeContact === user.id}" v-bind:contact="user"></Contact>
+                   v-bind:class="{'selected': activeContact === user.id}" v-bind:contact="user"></Contact>
         </div>
         <div v-else-if="activeTab === 'All'">
           <Contact v-for="user in allUsers" :key="user.id" @click.native="() => changeContact(user)"
-                   v-bind:class="{'active': activeContact === user.id}" v-bind:contact="user"></Contact>
+                   v-bind:class="{'selected': activeContact === user.id}" v-bind:contact="user"></Contact>
         </div>
       </div>
 
@@ -82,13 +82,11 @@ export default {
 
     changeQueryStr() {
       const str = this.queryStr;
-      if(this._isValidQueryStr(str)) {
 
+      if(this._isValidQueryStr(str)) {
         this.queryStr = str;
         this.filteredUsers = this.activeTab === 'Online' ?
           this._filter(this.onlineUsers, str) : this._filter(this.allUsers, str)
-
-        console.log(this.filteredUsers)
       }
     }
   }
@@ -98,12 +96,11 @@ export default {
 
 <style>
 
-
-
 .contact-area {
   height: 550px;
   overflow-y: scroll;
 }
+
 .nav-item {
   width: 50%;
   cursor: pointer;
@@ -112,23 +109,26 @@ export default {
 .card {
   border: #fff;
 }
+
 .contact-area {
   height: 660px;
 }
+
 .nav-link {
-  background-color: rgba(10,14,18,0.1);
+  background-color: #F8F8F8;
 }
 
 .card-body {
   padding-bottom: 5px;
 }
-.active {
-  background-color: white;
+
+.selected {
+  background-color: #BECBD9;
 }
+
 .input-group {
   padding-bottom: 9px;
 }
-
 /* width */
 ::-webkit-scrollbar {
   width: 10px;
@@ -136,19 +136,19 @@ export default {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey;
+  box-shadow: inset 0 0 5px #BECBD9;
   border-radius: 10px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: blue;
+  background: #9DAAB9;
   border-radius: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: red;
+  background-color: rgba(17,18,8,0.69);
 }
 
 </style>

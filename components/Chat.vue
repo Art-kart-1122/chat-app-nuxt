@@ -91,10 +91,21 @@ export default {
   padding: 0px;
   display: flex;
   justify-content: flex-start;
+  background-color: #BECBD9;
 }
+
+.admin-msg {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  padding-top: 20%;
+  font-weight: bold;
+  color: rgba(21,89,101,0.52);
+}
+
 .card {
   border: #fff;
-  background-color: rgba(176,175,255,0.69);
+  background-color: #D7DFE7;
 }
 
 .chat-area {
@@ -109,35 +120,38 @@ export default {
 
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey;
+  box-shadow: inset 0 0 5px #BECBD9;
   border-radius: 10px;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: blue;
+  background: #9DAAB9;
   border-radius: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: red;
+  background-color: rgba(17,18,8,0.69);
 }
+
 .input-form {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
 }
+
 input {
   width: 65%;
   min-width: 200px;
   margin-bottom: 10px;
 }
+
 button {
   width: 30%;
   white-space: nowrap;
   min-width: min-content;
-  margin-left: 30px;
+  margin-left: 25px;
   margin-bottom: 10px;
   padding-left: 15px;
   padding-right: 15px;
@@ -146,14 +160,17 @@ button {
 img {
   width: 150px;
 }
+
 .header {
   padding: 10px;
   height: 150px;
 }
+
 .description {
   height: 130px;
   overflow-y: hidden;
 }
+
 .description-text {
   overflow-wrap: break-word;
 }

@@ -1,8 +1,13 @@
 const {ChatRooms} = require('../../models/ChatRooms');
 const {Messages} = require('../../models/Messages');
 
-const aliveDemon = (io, id) => {
-  console.log(id)
+const {CHANGE_MESSAGES} = require('../../util/actionsTypesToClient');
+
+const aliveDemon = (socket, id) => {
+
+  // debug
+  //console.log('SPAM BOT WORK')
+  //
 
   const max = 120;
   const min = 10;
@@ -10,15 +15,15 @@ const aliveDemon = (io, id) => {
   const chats = ChatRooms.getChatRoomsByOneUserId(id);
 
   chats.forEach(chat => {
-    console.log('I am work')
-    const text = `I am Spam bot (-/_/-) .... ${Math.random()}`;
-    Messages.create({roomId: chat.id, text, ownerId:id});
 
+    const text = `I am Spam bot (-/_/-) .... ${Math.random()}`;
+
+    Messages.create({roomId: chat.id, text, ownerId: id});
     const updatedMessages = Messages.getMessagesByChatRoomId(chat.id);
 
-    io.to(chat.id).emit('changeMessages', {roomId: chat.id, messages:updatedMessages});
+    socket.to(chat.id).emit(CHANGE_MESSAGES, {roomId: chat.id, messages: updatedMessages});
   })
-  setTimeout(() => aliveDemon(io, id), randomTime * 1000)
+  setTimeout(() => aliveDemon(socket, id), randomTime * 1000)
 }
 
 module.exports = aliveDemon

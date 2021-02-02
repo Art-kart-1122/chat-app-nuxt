@@ -5,6 +5,7 @@ class Users {
   constructor() {
     throw new Error('Users is abstract class');
   }
+
   static status = ['online','offline'];
 
   static create({username, img }) {
@@ -17,9 +18,6 @@ class Users {
       isBot: false
     })
 
-    //
-    //console.log('ADD NEW USER ', id)
-    //
     return id
   }
 
@@ -31,25 +29,26 @@ class Users {
     return DB.users.find(user => user.id === id)
   }
 
+  static isValidId(id) {
+    return this.getById(id).id === id
+  }
+
   static isBot(id) {
     return this.getById(id)?.isBot
   }
+
   static getSpamBots() {
     return DB.users.filter(user => user.isSpamBot)
   }
+
   static setUserStatusByID(id, status) {
     if(this.getById(id) && this.status.includes(status)) {
 
       const idx = DB.users.findIndex(user => user.id === id);
       DB.users[idx].status = status;
 
-      //
-      console.log('CHANGE STATUS')
-      console.log(DB.users[idx].id, DB.users[idx].status)
-      //
-
     } else {
-      throw new Error('SetUserStatusByID')
+      throw new Error(`Unknown user status : ${status} or user ID`)
     }
   }
 }

@@ -1,13 +1,19 @@
 <template>
   <div class="app-wrap">
 
-    <div class="modal-contacts" @click="">
-      <ContactsList/>
-    </div>
 
     <div class="container-sm">
       <div class="row">
         <div class="col-8 merge">
+
+          <div class="modal-open-btn" @click="openModal"></div>
+
+          <div v-if="showModal">
+            <div class="modal-contacts" @click.self="closeModal">
+                <ContactsList/>
+            </div>
+          </div>
+
           <Chat/>
         </div>
         <div class="col-4 merge adapt-hide">
@@ -23,19 +29,23 @@
 import Chat from "~/components/Chat";
 import ContactsList from "~/components/ContactsList";
 
-import { mapActions } from "vuex";
-
 export default {
+  data: () => ({
+    showModal: false
+  }),
 
   components: {
     Chat, ContactsList
   },
 
-  beforeMount() {
-    //this.userAuth();
-  },
   methods: {
+    openModal() {
+      this.showModal = true;
+    },
 
+    closeModal() {
+      this.showModal = false;
+    }
   }
 }
 </script>
@@ -49,13 +59,32 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(5,62,129,0.69);
+    background-color: #586670;
   }
   .merge {
     padding: 0px;
   }
+
   .modal-contacts {
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(8,11,18,0.15);
+  }
+
+  .modal-open-btn {
     display: none;
+    width: 50px;
+    height: 50px;
+    background: #586670;
+    border-radius: 50%;
+    position: absolute;
+    z-index: 5;
+    cursor: pointer;
   }
 
   @media screen and (max-width: 1000px) {
@@ -63,24 +92,21 @@ export default {
       display: flex;
       justify-content: center;
     }
-    .modal-contacts {
-      position: fixed;
-      z-index: 10;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+
     .adapt-hide {
       display: none;
+    }
+
+    .modal-open-btn {
+      display: block;
     }
   }
 
   @media screen and (max-width: 700px) {
     .row {
       margin: 0px;
-      max-width: 100%;
+      width: 100%;
+      min-width: 400px;
     }
   }
 

@@ -12,6 +12,8 @@ export const state = () => ({
 })
 
 export const mutations = {
+  // local mutations
+
   setUser(state, user) {
     state.user = user;
   },
@@ -19,40 +21,36 @@ export const mutations = {
   setUserStatus(state, status) {
     state.user.status = status;
   },
+
   setCurrentContact(state, contactId) {
-    console.log('CHANGE CURRENT CONTACT')
     state.currentContact = contactId;
   },
+
+  // mutations from server
+
   SOCKET_changeContacts(state, contacts) {
     state.contacts = contacts;
-    //
-    console.log('CHANGE CONTACTS')
-    console.log(state.contacts)
   },
 
   SOCKET_changeChatRoom(state, chatRoomId) {
     state.chatRoom = chatRoomId;
-
-    console.log('CHANGE CHAT')
-    console.log(state.chatRoom)
   },
 
   SOCKET_changeMessages(state, {roomId, messages}) {
     if(state.chatRoom === roomId) state.messages = messages;
-
-    console.log('CHANGE MESSAGES')
-    console.log(state.messages)
   }
 }
 
+// server receiver action
+const SEND_MESSAGE = 'sendMessage';
+const CHANGE_CHATROOM_BY_USERS = 'changeChatRoomByUsers';
+const SET_USER_STATUS = 'setUserStatus';
+const AUTHENTICATION = 'Auth';
+
 
 export const actions = {
-  socketEmit(_, { action, payload, cb }) {
-    //
-    //console.log('SOCKET EMIT')
-    //
-    return this._vm.$socket.emit(action, payload, cb);
-  },
+
+  // local actions
 
   getUserDataFromLocalStorage({commit}) {
     commit('setUser', {
@@ -70,49 +68,83 @@ export const actions = {
     localStorage.setItem('status', status);
   },
 
+  // server actions
+
+  socketEmit(_, { action, payload, cb }) {
+    return this._vm.$socket.emit(action, payload, cb);
+  },
+
   SOCKET_connect({dispatch}) {
-    //
+    dispatch('userAuth');
+
+    // debug
     //console.log('CLIENT CONNECT');
     //
-    dispatch('userAuth')
+  },
+
+  SOCKET_reconnect({dispatch}) {
+    dispatch('userAuth');
   },
 
   userAuth({dispatch, state, commit}) {
-    //
-    //console.log('USER AUTH');
-    //
     dispatch('getUserDataFromLocalStorage');
-
     const { user } = state;
+
+    // debug
+    //console.log('CLIENT AUTH')
+    //
+
     dispatch('socketEmit', {
-      action: 'Auth',
+      action: AUTHENTICATION,
       payload: user,
       cb: ({isValid, user}) => {
         if(isValid) {
+
+          // debug
+          //console.log('CLIENT AUTH -- VALID');
+          //
+
           commit('setUserStatus', 'online');
         } else {
+
+          // debug
+          //console.log('CLIENT AUTH -- NEW');
+          //
+
           dispatch('setUserDataToLocalStorage', user);
           commit('setUser', user);
         }
 
         dispatch('socketEmit', {
-          action: 'SetUserStatus',
+          action: SET_USER_STATUS,
           payload: 'online'
         });
       }
     })
   },
+
   startMessages({dispatch, state, commit}, contact) {
     const {user} = state;
     commit('setCurrentContact', contact);
+
+    // debug
+    //console.log('CLIENT CHANGE CHAT ROOM ');
+    //
+
     dispatch('socketEmit', {
-      action: 'changeChatRoomByUsers',
+      action: CHANGE_CHATROOM_BY_USERS,
       payload: {id1: user.id, id2: contact.id}
     })
   },
+
   sendMessage({dispatch, state}, text) {
+
+    // debug
+    //console.log('CLIENT SEND MESSAGE')
+    //
+
     dispatch('socketEmit', {
-      action: 'sendMessage',
+      action: SEND_MESSAGE,
       payload: {roomId: state.chatRoom, text, ownerId: state.user.id}
     })
   }
